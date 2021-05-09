@@ -25,8 +25,13 @@ copia_lista_n(L, N, R) :-
     copia_lista_n(L, N1, R2),
     append(L, R2, R).
 se_repite([],_,_,0):-!.
-se_repite(Cs,Parte,_,T):-length(Cs, Ls), length(Parte, La),T is Ls//La, copia_lista_n(Parte,T,Cs).
+se_repite(Cs,Parte,N0,Num):-length(Cs, Ls), length(Parte, La),T is Ls//La, copia_lista_n(Parte,T,Cs), Num is N0 + T.
 
 %FASE A
 repeticion(Inicial, Comprimida):-partir(Inicial, Parte1, _), se_repite(Inicial,Parte1,0,R), compresion_recursiva(Parte1, Comp),
     parentesis(Comp,R,Comprimida).
+
+compresion(X,Y).
+mejor_compresion(X,Y).
+mejor_compresion_memo(X,Y).
+memo(X,Y).
