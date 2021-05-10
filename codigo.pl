@@ -22,8 +22,8 @@ compresion_recursiva(Inicial, Inicial).
 partir(Todo, Parte1, Parte2):-append(Parte1,Parte2,Todo), length(Parte1,N1), N1>0, length(Parte2,N2), N2>0. 
 
 %Parentesis/3
-parentesis(Parte,Num,ParteNum):- integer(Num), length(Parte,N), N>=2, append(['('],Parte,L1), append(L1,[')',Num],ParteNum).
-parentesis(Parte,Num,ParteNum):- integer(Num), length(Parte,N), N<2, append(Parte,[Num],ParteNum).
+parentesis([X|Parte],Num,ParteNum):- integer(Num), length([X|Parte],N), N>=2, append(['('],[X|Parte],L1), append(L1,[')',Num],ParteNum),!.
+parentesis([X|Parte],Num,ParteNum):- integer(Num), length([X|Parte],N), N<2, append([X|Parte],[Num],ParteNum),!.
 
 %% parentesis(Parte,Num,ParteNum):-  append(L1,[')',Num],ParteNum), append(['('],Parte,L1),integer(Num),  length(Parte,N), N>=2.
 %% parentesis(Parte,Num,ParteNum):-  append(Parte,[Num],ParteNum), integer(Num),  length(Parte,N), N<2.
