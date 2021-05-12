@@ -31,7 +31,7 @@ mejor_compresion_memo(Inicial, Comprimida) :-
 
 %Partir/3
 partir(Todo, Parte1, Parte2):-
-    append(Parte1,Parte2,Todo), length(Parte1,N1), N1>0, length(Parte2,N2), N2>0.
+    append(Parte1,Parte2,Todo), Parte1 \= [], Parte2 \= [].
 
 %Parentesis/3
 parentesis([X|Parte],Num,ParteNum):- integer(Num), length([X|Parte],N), N>=2, append(['('],[X|Parte],L1), append(L1,[')',Num],ParteNum),!.
@@ -50,7 +50,7 @@ copia_lista_n(L, N, R) :-
     copia_lista_n(L, N1, R2),
     append(L, R2, R).
 se_repite([],_,_,0):-!.
-se_repite(Cs,Parte,N0,Num):-length(Cs, Ls), length(Parte, La),T is Ls//La, copia_lista_n(Parte,T,Cs), Num is N0 + T.
+se_repite(Cs,Parte,N0,Num):-length(Cs, Ls), length(Parte, La), 0 is Ls mod La, T is Ls//La, copia_lista_n(Parte,T,Cs), Num is N0 + T.
 
 %FASE A
 repeticion(Inicial, Comprimida):-
@@ -68,9 +68,6 @@ division(Inicial, Comprimida) :-
     append(Comprimida1, Comprimida2, Comprimida),
     Inicial \= Comprimida.
 
-
-%% compresion(Inicial, Comprimida) :-
-%%     division(Inicial, Comprimida).
 
 compresion(Inicial, Comprimida) :-
     repeticion(Inicial, Comprimida).
@@ -91,16 +88,6 @@ mejor_compresion(Inicial, Inicial).
 choose_minor(L, Comprimida) :-
     choose_minor2(L, _, Comprimida).
 
-%% choose_minor2([], _, _).
-%% choose_minor2(L, N, ComprimidaMenor) :-
-%%     L = [H|T],
-%%     length(H, HN),
-%%     (HN < N ->
-%%         ComprimidaMenor = H,
-%%         choose_minor2(T, HN, ComprimidaMenor)
-%%     ;
-%%         choose_minor2(T, N, ComprimidaMenor)
-%%     ).
 
 choose_minor2([], 999, []).
 choose_minor2(L, N, ComprimidaMenor) :-
@@ -114,3 +101,14 @@ choose_minor2(L, N, ComprimidaMenor) :-
         ComprimidaMenor = ComprimidaMenor2,
         N = ComprimidaMenor2N
     ).
+
+%% choose_minor2([], _, _).
+%% choose_minor2(L, N, ComprimidaMenor) :-
+%%     L = [H|T],
+%%     length(H, HN),
+%%     (HN < N ->
+%%         ComprimidaMenor = H,
+%%         choose_minor2(T, HN, ComprimidaMenor)
+%%     ;
+%%         choose_minor2(T, N, ComprimidaMenor)
+%%     ).
