@@ -1,20 +1,19 @@
 :- module(_,_,[classic,assertions,regtypes]).
 
-alumno_prode('Cabero','Blanco','Aaron','180440').
 
-%% :- prop alumno_prode/4 #"@includedef{alumno_prode/4}".
-%% alumno_prode('Tomas', 'Sanchez', 'Daniel', 'a180428').
+:- prop alumno_prode/4 #"@includedef{alumno_prode/4}".
+alumno_prode('Tomas', 'Sanchez', 'Daniel', 'a180428').
 
-%% :- doc(title, "Second Proyect - Pure logic programming").
+:- doc(title, "Second Proyect - Pure logic programming").
 
-%% :- doc(author, "Daniel Tomas Sanchez, 180428").
+:- doc(author, "Daniel Tomas Sanchez, 180428").
 
 
-comprimir(Inicial, Comprimida):-limpia_memo, compresion_recursiva(Inicial, Comprimida).
+comprimir(Inicial, Comprimida):-
+    limpia_memo, compresion_recursiva(Inicial, Comprimida).
 limpia_memo.
 compresion_recursiva(Inicial, Comprimida):-
-    compresion(Inicial, Comprimida).
-compresion_recursiva(Inicial, Inicial).
+    mejor_compresion(Inicial, Comprimida).
 
 %PRELIMINARES
 
@@ -41,7 +40,10 @@ se_repite([],_,_,0):-!.
 se_repite(Cs,Parte,N0,Num):-length(Cs, Ls), length(Parte, La),T is Ls//La, copia_lista_n(Parte,T,Cs), Num is N0 + T.
 
 %FASE A
-repeticion(Inicial, Comprimida):-partir(Inicial, Parte1, _), se_repite(Inicial,Parte1,0,R), compresion_recursiva(Parte1, Comp),
+repeticion(Inicial, Comprimida):-
+    partir(Inicial, Parte1, _),
+    se_repite(Inicial,Parte1,0,R),
+    compresion_recursiva(Parte1, Comp),
     parentesis(Comp,R,Comprimida).
 
 
@@ -64,8 +66,41 @@ compresion(Inicial, Comprimida) :-
     division(Inicial, Comprimida).
 
 
+% FASE C
+mejor_compresion(Inicial, Comprimida) :-
+    findall(ComprimidaAux, compresion(Inicial, ComprimidaAux), L),
+    length(L, LN),
+    LN > 0,
+    choose_minor(L, Comprimida).
 
-%% compresion(X,Y).
-mejor_compresion(X,Y).
+mejor_compresion(Inicial, Inicial).
+
+choose_minor(L, Comprimida) :-
+    choose_minor2(L, _, Comprimida).
+
+%% choose_minor2([], _, _).
+%% choose_minor2(L, N, ComprimidaMenor) :-
+%%     L = [H|T],
+%%     length(H, HN),
+%%     (HN < N ->
+%%         ComprimidaMenor = H,
+%%         choose_minor2(T, HN, ComprimidaMenor)
+%%     ;
+%%         choose_minor2(T, N, ComprimidaMenor)
+%%     ).
+
+choose_minor2([], 999, []).
+choose_minor2(L, N, ComprimidaMenor) :-
+    L = [H|T],
+    length(H, HN),
+    choose_minor2(T, ComprimidaMenor2N, ComprimidaMenor2),
+    (HN < ComprimidaMenor2N ->
+        ComprimidaMenor = H,
+        N = HN
+    ;
+        ComprimidaMenor = ComprimidaMenor2,
+        N = ComprimidaMenor2N
+    ).
+
 mejor_compresion_memo(X,Y).
 memo(X,Y).
