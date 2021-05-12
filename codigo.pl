@@ -1,5 +1,7 @@
 :- module(_,_,[classic,assertions,regtypes]).
+:- dynamic memo /2.
 
+%% alumno_prode('Cabero','Blanco','Aaron','180440').
 
 :- prop alumno_prode/4 #"@includedef{alumno_prode/4}".
 alumno_prode('Tomas', 'Sanchez', 'Daniel', 'a180428').
@@ -8,17 +10,28 @@ alumno_prode('Tomas', 'Sanchez', 'Daniel', 'a180428').
 
 :- doc(author, "Daniel Tomas Sanchez, 180428").
 
-
 comprimir(Inicial, Comprimida):-
     limpia_memo, compresion_recursiva(Inicial, Comprimida).
-limpia_memo.
-compresion_recursiva(Inicial, Comprimida):-
-    mejor_compresion(Inicial, Comprimida).
+
+limpia_memo :-
+    retractall(memo(_,_)).
+
+compresion_recursiva(Inicial , Comprimida ) :-
+    mejor_compresion_memo(Inicial , Comprimida ).
+
+mejor_compresion_memo(Inicial, Comprimida) :-
+    memo(Inicial, Comprimida).
+
+mejor_compresion_memo(Inicial, Comprimida) :-
+    mejor_compresion(Inicial, Comprimida),
+    assert(memo(Inicial, Comprimida)).
+
 
 %PRELIMINARES
 
 %Partir/3
-partir(Todo, Parte1, Parte2):-append(Parte1,Parte2,Todo), length(Parte1,N1), N1>0, length(Parte2,N2), N2>0. 
+partir(Todo, Parte1, Parte2):-
+    append(Parte1,Parte2,Todo), length(Parte1,N1), N1>0, length(Parte2,N2), N2>0.
 
 %Parentesis/3
 parentesis([X|Parte],Num,ParteNum):- integer(Num), length([X|Parte],N), N>=2, append(['('],[X|Parte],L1), append(L1,[')',Num],ParteNum),!.
@@ -101,6 +114,3 @@ choose_minor2(L, N, ComprimidaMenor) :-
         ComprimidaMenor = ComprimidaMenor2,
         N = ComprimidaMenor2N
     ).
-
-mejor_compresion_memo(X,Y).
-memo(X,Y).
