@@ -29,7 +29,7 @@ compresion_recursiva(Inicial , Comprimida ) :-
 :- pred mejor_compresion_memo(Inicial, Comprimida)
    #"@var{Comprimida} is the compressed version with the shortest length of the list @var{Inicial}. The compression process uses memoization. @includedef{compresion_recursiva/2}".
 mejor_compresion_memo(Inicial, Comprimida) :-
-    memo(Inicial, Comprimida).
+    memo(Inicial, Comprimida),!.
 
 mejor_compresion_memo(Inicial, Comprimida) :-
     mejor_compresion(Inicial, Comprimida),
@@ -37,7 +37,6 @@ mejor_compresion_memo(Inicial, Comprimida) :-
 
 
 %PRELIMINARES
-
 :- pred partir(Todo, Parte1, Parte2)
    #"@var{Parte1} and @var{Parte2} are non empty subsequences of the list @var{Todo}. @includedef{partir/3}".
 partir(Todo, Parte1, Parte2):-
@@ -45,8 +44,8 @@ partir(Todo, Parte1, Parte2):-
 
 :- pred parentesis(Parte, Num, ParteNum)
    #"@var{ParteNum} is the result of appending @var{Num} to @var{Parte}. If @var{Parte} has two elements or more @var{Parte} is surrounded by brackets. @includedef{parentesis/3}".
-parentesis([X|Parte],Num,ParteNum):- integer(Num), length([X|Parte],N), N>=2, append(['('],[X|Parte],L1), append(L1,[')',Num],ParteNum),!.
-parentesis([X|Parte],Num,ParteNum):- integer(Num), append([X|Parte], [Num], ParteNum).
+parentesis([X,Y|Parte],Num,ParteNum):- integer(Num),  append(['('],[X,Y|Parte],L1), append(L1,[')',Num],ParteNum),!.
+parentesis([X],Num,ParteNum):- integer(Num), append([X], [Num], ParteNum).
 
 %% parentesis(Parte,Num,ParteNum):-  append(L1,[')',Num],ParteNum), append(['('],Parte,L1),integer(Num),  length(Parte,N), N>=2.
 %% parentesis(Parte,Num,ParteNum):-  append(Parte,[Num],ParteNum), integer(Num),  length(Parte,N), N<2.
@@ -91,10 +90,17 @@ division(Inicial, Comprimida) :-
 :- pred compresion(Inicial, Comprimida)
    #"@var{Comprimida} is the compressed version of the list @var{Inicial}. @includedef{compresion/2}".
 compresion(Inicial, Comprimida) :-
-    repeticion(Inicial, Comprimida).
+    repeticion(Inicial, Comprimida),
+    length(Inicial,Li),
+    length(Comprimida,Lc),
+    Lc<Li.
 
 compresion(Inicial, Comprimida) :-
-    division(Inicial, Comprimida).
+    division(Inicial, Comprimida),
+    length(Inicial,Li),
+    length(Comprimida,Lc),
+    Lc<Li.
+compresion(Inicial,Inicial).
 
 
 % FASE C
@@ -103,7 +109,7 @@ compresion(Inicial, Comprimida) :-
 mejor_compresion(Inicial, Comprimida) :-
     findall(ComprimidaAux, compresion(Inicial, ComprimidaAux), L),
     L \= [],
-    choose_minor(L, Comprimida).
+    choose_minor(L, Comprimida),!.
 
 mejor_compresion(Inicial, Inicial).
 
