@@ -1,135 +1,153 @@
-:- module(_,_,[classic,assertions,regtypes]).
+:- module(_, _, [classic, assertions, regtypes]).
 
-%% alumno_prode('Cabero','Blanco','Aaron','180440').
-
-:- prop alumno_prode/4 #"@includedef{alumno_prode/4}".
-alumno_prode('Tomas', 'Sanchez', 'Daniel', 'a180428').
-
-:- doc(title, "Second Proyect - Pure logic programming").
+:- doc(title, "Second Proyect - ISO Prolog").
 
 :- doc(author, "Daniel Tomas Sanchez, 180428").
 
-:- pred comprimir(Inicial, Comprimida)
-   #"@var{Comprimida} is the compressed version with the shortest length of the list @var{Inicial}. The compression process uses memoization. First of all, clean all previous results memoizated. @includedef{comprimir/2}".
-comprimir(Inicial, Comprimida):-
-    limpia_memo, compresion_recursiva(Inicial, Comprimida).
+:- prop alumno_prode/4
+   #"@includedef{alumno_prode/4}".
+alumno_prode('Tomas', 'Sanchez', 'Daniel', 'a180428').
 
-:- dynamic memo /2.
+
+:- pred comprimir(Initial, Compressed)
+   #"@var{Compressed} is the compressed version with the shortest length of the list @var{Initial}. The compression process uses memoization. First of all, clean all previous results memoizated. @includedef{comprimir/2}".
+comprimir(Initial, Compressed) :-
+    limpia_memo,
+    compresion_recursiva(Initial, Compressed).
+
+
+:- dynamic memo/2.
 
 :- pred limpia_memo
    #"Clean all results previously memoizated. @includedef{limpia_memo/0}".
 limpia_memo :-
     retractall(memo(_,_)).
 
-:- pred compresion_recursiva(Inicial, Comprimida)
-   #"@var{Comprimida} is the compressed version with the shortest length of the list @var{Inicial}. The compression process uses memoization. @includedef{compresion_recursiva/2}".
-compresion_recursiva(Inicial , Comprimida ) :-
-    mejor_compresion_memo(Inicial , Comprimida ).
 
-:- pred mejor_compresion_memo(Inicial, Comprimida)
-   #"@var{Comprimida} is the compressed version with the shortest length of the list @var{Inicial}. The compression process uses memoization. @includedef{compresion_recursiva/2}".
-mejor_compresion_memo(Inicial, Comprimida) :-
-    memo(Inicial, Comprimida),!.
-
-mejor_compresion_memo(Inicial, Comprimida) :-
-    mejor_compresion(Inicial, Comprimida),
-    assert(memo(Inicial, Comprimida)).
+:- pred compresion_recursiva(Initial, Compressed)
+   #"@var{Compressed} is the compressed version with the shortest length of the list @var{Initial}. The compression process uses memoization. @includedef{compresion_recursiva/2}".
+compresion_recursiva(Initial , Compressed ) :-
+    mejor_compresion_memo(Initial , Compressed ).
 
 
-%PRELIMINARES
-:- pred partir(Todo, Parte1, Parte2)
-   #"@var{Parte1} and @var{Parte2} are non empty subsequences of the list @var{Todo}. @includedef{partir/3}".
-partir(Todo, Parte1, Parte2):-
-    append(Parte1,Parte2,Todo), Parte1 \= [], Parte2 \= [].
+:- pred mejor_compresion_memo(Initial, Compressed)
+   #"@var{Compressed} is the compressed version with the shortest length of the list @var{Initial}. The compression process uses memoization. @includedef{mejor_compresion_memo/2}".
+mejor_compresion_memo(Initial, Compressed) :-
+    memo(Initial, Compressed),
+    !.
 
-:- pred parentesis(Parte, Num, ParteNum)
-   #"@var{ParteNum} is the result of appending @var{Num} to @var{Parte}. If @var{Parte} has two elements or more @var{Parte} is surrounded by brackets. @includedef{parentesis/3}".
-parentesis([X,Y|Parte],Num,ParteNum):- integer(Num),  append(['('],[X,Y|Parte],L1), append(L1,[')',Num],ParteNum),!.
-parentesis([X],Num,ParteNum):- integer(Num), append([X], [Num], ParteNum).
-
-%% parentesis(Parte,Num,ParteNum):-  append(L1,[')',Num],ParteNum), append(['('],Parte,L1),integer(Num),  length(Parte,N), N>=2.
-%% parentesis(Parte,Num,ParteNum):-  append(Parte,[Num],ParteNum), integer(Num),  length(Parte,N), N<2.
+mejor_compresion_memo(Initial, Compressed) :-
+    mejor_compresion(Initial, Compressed),
+    assert(memo(Initial, Compressed)).
 
 
-%Auxiliar de Se_repite
-%% :- pred
-%%    #"@var{}. @includedef{}".
-copia_lista_n(_, 0, []).
-copia_lista_n(L, N, R) :-
+:- pred partir(Whole, Part1st, Part2nd)
+   #"@var{Part1st} and @var{Part2nd} are non empty subsequences of the list @var{Whole}. @includedef{partir/3}".
+partir(Whole, Part1st, Part2nd) :-
+    append(Part1st, Part2nd, Whole),
+    Part1st \= [],
+    Part2nd \= [].
+
+
+:- pred parentesis(Part, Ocur, R)
+   #"@var{R} is the result of appending @var{Ocur} to @var{Part}. If @var{Part} has two elements or more @var{Part} is surrounded by brackets. @includedef{parentesis/3}".
+parentesis([X,Y|Part], Ocur, R) :-
+    integer(Ocur),
+    append(['('], [X,Y|Part], L1),
+    append(L1, [')', Ocur], R),
+    !.
+
+parentesis([X], Ocur, R) :-
+    integer(Ocur),
+    append([X], [Ocur], R).
+
+
+:- pred repeat_list(L, N, R)
+   #"@var{R} is the result of repeating @var{N} times the list @var{L}. @includedef{repeat_list/3}".
+repeat_list(_, 0, []).
+repeat_list(L, N, R) :-
     N > 0,
-    N1 is N-1,
-    copia_lista_n(L, N1, R2),
-    append(L, R2, R).
+    N1 is N - 1,
+    repeat_list(L, N1, R1),
+    append(L, R1, R).
 
-:- pred se_repite(Cs, Parte, N0, Num)
-   #"@var{Num} is the result of adding @em{N} to @var{N0}, being @em{N} the number of repetitions of @var{Parte} which form @var{Cs} . @includedef{se_repite/4}".
-se_repite([],_,_,0):-!.
-se_repite(Cs,Parte,N0,Num):-length(Cs, Ls), length(Parte, La), 0 is Ls mod La, T is Ls//La, copia_lista_n(Parte,T,Cs), Num is N0 + T.
+:- pred se_repite(Cs, Part, N0, Num)
+   #"@var{Num} is the result of adding @em{N} to @var{N0}, being @em{N} the number of repetitions of @var{Part} which form @var{Cs} . @includedef{se_repite/4}".
+se_repite([], _, _, 0) :-
+    !.
 
-%FASE A
-:- pred repeticion(Inicial, Comprimida)
-   #"@var{Comprimida} is the compressed by repetition version of the list @var{Inicial}. @includedef{repeticion/2}".
-repeticion(Inicial, Comprimida):-
-    partir(Inicial, Parte1, _),
-    se_repite(Inicial,Parte1,0,R),
-    compresion_recursiva(Parte1, Comp),
-    parentesis(Comp,R,Comprimida).
-
-
-% FASE B
-:- pred division(Inicial, Comprimida)
-   #"@var{Comprimida} is the compressed by division version of the list @var{Inicial}. @includedef{division/2}".
-division(Inicial, Comprimida) :-
-    partir(Inicial, Parte1, Parte2),
-    compresion_recursiva(Parte1, Comprimida1),
-    compresion_recursiva(Parte2, Comprimida2),
-    append(Comprimida1, Comprimida2, Comprimida),
-    Inicial \= Comprimida.
+se_repite(Cs, Part, N0, Num) :-
+    length(Cs, CsN),
+    length(Part, PartN),
+    0 is CsN mod PartN,
+    Reps is CsN // PartN,
+    repeat_list(Part, Reps, Cs),
+    Num is N0 + Reps.
 
 
-:- pred compresion(Inicial, Comprimida)
-   #"@var{Comprimida} is the compressed version of the list @var{Inicial}. @includedef{compresion/2}".
-compresion(Inicial, Comprimida) :-
-    repeticion(Inicial, Comprimida),
-    length(Inicial,Li),
-    length(Comprimida,Lc),
-    Lc<Li.
-
-compresion(Inicial, Comprimida) :-
-    division(Inicial, Comprimida),
-    length(Inicial,Li),
-    length(Comprimida,Lc),
-    Lc<Li.
-compresion(Inicial,Inicial).
+:- pred repeticion(Initial, Compressed)
+   #"@var{Compressed} is the compressed by repetition version of the list @var{Initial}. @includedef{repeticion/2}".
+repeticion(Initial, Compressed) :-
+    partir(Initial, Part1st, _),
+    se_repite(Initial, Part1st, 0, R),
+    compresion_recursiva(Part1st, Comp),
+    parentesis(Comp, R, Compressed).
 
 
-% FASE C
-:- pred mejor_compresion(Inicial, Comprimida)
-   #"@var{Comprimida} is the compressed version with the shortest length of the list @var{Inicial}. @includedef{mejor_compresion/2}".
-mejor_compresion(Inicial, Comprimida) :-
-    findall(ComprimidaAux, compresion(Inicial, ComprimidaAux), L),
+:- pred division(Initial, Compressed)
+   #"@var{Compressed} is the compressed by division version of the list @var{Initial}. @includedef{division/2}".
+division(Initial, Compressed) :-
+    partir(Initial, Part1st, Part2nd),
+    compresion_recursiva(Part1st, Comp1st),
+    compresion_recursiva(Part2nd, Comp2nd),
+    append(Comp1st, Comp2nd, Compressed),
+    Initial \= Compressed.
+
+
+:- pred compresion(Initial, Compressed)
+   #"@var{Compressed} is the compressed version of the list @var{Initial}. @includedef{compresion/2}".
+compresion(Initial, Compressed) :-
+    repeticion(Initial, Compressed),
+    length(Initial, InitN),
+    length(Compressed, CompN),
+    CompN < InitN.
+
+compresion(Initial, Compressed) :-
+    division(Initial, Compressed),
+    length(Initial, InitN),
+    length(Compressed, CompN),
+    CompN < InitN.
+
+compresion(Initial, Initial).
+
+
+:- pred mejor_compresion(Initial, Compressed)
+   #"@var{Compressed} is the compressed version with the shortest length of the list @var{Initial}. @includedef{mejor_compresion/2}".
+mejor_compresion(Initial, Compressed) :-
+    findall(Comp, compresion(Initial, Comp), L),
     L \= [],
-    choose_minor(L, Comprimida),!.
+    choose_smallest(L, Compressed),
+    !.
 
-mejor_compresion(Inicial, Inicial).
-
-:- pred choose_minor(L, Comprimida)
-   #"@var{Comprimida} is the sublist with the shortest length of the list @var{L}. @includedef{choose_minor/2}".
-choose_minor(L, Comprimida) :-
-    choose_minor2(L, _, Comprimida).
+mejor_compresion(Initial, Initial).
 
 
-:- pred choose_minor2(L, N, ComprimidaMenor)
-   #"@var{ComprimidaMenor} is the sublist with length @var{N} and the shortest length of the list @var{L}. @includedef{choose_minor2/3}".
-choose_minor2([], 999, []).
-choose_minor2(L, N, ComprimidaMenor) :-
+:- pred choose_smallest(L, Compressed)
+   #"@var{Compressed} is the sublist with the shortest length of the list @var{L}. @includedef{choose_smallest/2}".
+choose_smallest(L, Compressed) :-
+    choose_smallest(L, _, Compressed).
+
+:- pred choose_smallest(L, SmCompN, SmComp)
+   #"@var{SmComp} is the sublist with length @var{SmCompN} and the shortest length of the list @var{L}. @includedef{choose_smallest/3}".
+choose_smallest([], 10 ** 10, []).
+choose_smallest(L, SmCompN, SmComp) :-
     L = [H|T],
     length(H, HN),
-    choose_minor2(T, ComprimidaMenor2N, ComprimidaMenor2),
-    (HN < ComprimidaMenor2N ->
-        ComprimidaMenor = H,
-        N = HN
+    choose_smallest(T, SmCompAuxN, SmCompAux),
+    (HN < SmCompAuxN ->
+        SmComp = H,
+        SmCompN = HN
     ;
-        ComprimidaMenor = ComprimidaMenor2,
-        N = ComprimidaMenor2N
+        SmComp = SmCompAux,
+        SmCompN = SmCompAuxN
     ).
